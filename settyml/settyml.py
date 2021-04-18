@@ -36,10 +36,10 @@ class Reader(dict):
     @staticmethod
     def _filter_for_settings(_dict):
         try:
-            settings = _dict['Reader']
+            settings = _dict['Settings']
             return Reader.read(settings)
         except KeyError:
-            raise SettingsNotFoundError('Reader should be a defined '
+            raise SettingsNotFoundError('Settings should be a defined '
                                         'section in provided YAML')
 
     @staticmethod
