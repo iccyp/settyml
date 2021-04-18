@@ -22,7 +22,7 @@ def get_version(rel_path):
 with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
-version = get_version('confyml/__init__.py')
+version = get_version('settyml/__init__.py')
 
 setup(
     name="settyml",
