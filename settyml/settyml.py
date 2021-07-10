@@ -17,21 +17,30 @@ class Reader(dict):
     env_var_matcher = re.compile(r'\$\{([^}^{]+)\}')
 
     def __init__(self, yaml_settings: str):
-        self.settings = Reader.load_settings_yaml(yaml_settings)
+        self.settings = Reader._load_settings_yaml(yaml_settings)
         super().__init__(self.settings)
 
     @staticmethod
-    def load_settings_yaml(yaml_settings: str):
+    def _load_settings_yaml(yaml_settings: str):
         try:
             with open(yaml_settings, 'r') as settings_stream:
                 settings_dict = yaml.safe_load(settings_stream)
             return Reader._filter_for_settings(settings_dict)
         except FileNotFoundError as file_err:
-            settings_dict = yaml.safe_load(yaml_settings)
-            if isinstance(settings_dict, dict):
-                return Reader._filter_for_settings(settings_dict)
+            Reader._handle_load_error(yaml_settings, file_err)
+        except OSError as os_err:
+            if os_err.errno == 36:
+                Reader._handle_load_error(yaml_settings, os_err)
             else:
-                raise FileNotFoundError(file_err)
+                raise os_err
+
+    @staticmethod
+    def _handle_load_error(yaml_settings, original_err):
+        settings_dict = yaml.safe_load(yaml_settings)
+        if isinstance(settings_dict, dict):
+            return Reader._filter_for_settings(settings_dict)
+        else:
+            raise original_err
 
     @staticmethod
     def _filter_for_settings(_dict):
